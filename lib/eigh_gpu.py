@@ -8,7 +8,6 @@ Created on Mon Mar 12 21:50:15 2018
 
 from skcuda import linalg as cuda_linalg
 import pycuda.gpuarray as gpuarray
-cuda_linalg.init()
 
 
 def eigh_gpu(X):

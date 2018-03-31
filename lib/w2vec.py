@@ -44,11 +44,27 @@ class Word2vec():
         vect2=self.word2vec[w2]
         return np.dot(vect1.transpose(),vect2)[0][0]/(np.linalg.norm(vect1)*np.linalg.norm(vect2))
     
-    def vocab_similarity(self):
-        norm=np.sqrt(np.sum(self.embeddings**2,0))
-        return np.dot((self.embeddings/norm).transpose(),self.embeddings/norm)
+    def vocab_similarity(self,size=False):
+        if size:
+            selected_obs=np.random.choice(range(self.embeddings.shape[1]),size,replace=False)
+        else:
+            selected_obs=list(range(self.embeddings.shape[1]))
+        norm=np.sqrt(np.sum(self.embeddings[:,selected_obs]**2,0))
+        return np.dot((self.embeddings[:,selected_obs]/norm).transpose(),self.embeddings[:,selected_obs]/norm)
         
-    def semantic_similarity(self):
-        norm=np.sqrt(np.sum(self.embeddings**2,1)).reshape((-1,1))
-        embeddings=self.embeddings/norm
+    def semantic_similarity(self,size=False):
+        if size:
+            selected_obs=np.random.choice(range(self.embeddings.shape[1]),size,replace=False)
+        else:
+            selected_obs=list(range(self.embeddings.shape[1]))
+        norm=np.sqrt(np.sum(self.embeddings[:,selected_obs]**2,1)).reshape((-1,1))
+        embeddings=self.embeddings[:,selected_obs]/norm
         return np.dot((embeddings),embeddings.transpose())
+    
+    def semantic_similarity_std(self,size=False):
+        if size:
+            selected_obs=np.random.choice(range(self.embeddings.shape[1]),size,replace=False)
+        else:
+            selected_obs=list(range(self.embeddings.shape[1]))
+        embeddings=(self.embeddings[:,selected_obs]-np.mean(self.embeddings[:,selected_obs],0))/np.std(self.embeddings[:,selected_obs],0)
+        return np.dot((embeddings),embeddings.transpose()), np.std(self.embeddings[:,selected_obs],0)
