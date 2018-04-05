@@ -8,6 +8,7 @@ Created on Sat Mar 31 14:34:03 2018
 
 from os import listdir
 from os.path import isfile, join
+
 available_lang = [f.split(".")[1] for f in listdir('fastText') if isfile(join('fastText', f))]
 
 from tqdm import tqdm

@@ -10,14 +10,13 @@ import numpy as np
 
 class Word2vec():
     def __init__(self, fname, nmax=100000,random=1):
+        self.word2vec = {}
         self.load_wordvec(fname, nmax,random=random)
-        self.wordvectors={}
         self.id2word = dict(enumerate(self.word2vec.keys()))
         self.word2id = {v: k for k, v in self.id2word.items()}
         self.embeddings = np.concatenate(list(self.word2vec.values()),1)
     
     def load_wordvec(self, fname, nmax,random=1):
-        self.word2vec = {}
         with io.open(fname, encoding='utf-8') as f:
             next(f)
             for i, line in enumerate(f):
@@ -68,3 +67,41 @@ class Word2vec():
             selected_obs=list(range(self.embeddings.shape[1]))
         embeddings=(self.embeddings[:,selected_obs]-np.mean(self.embeddings[:,selected_obs],0))/np.std(self.embeddings[:,selected_obs],0)
         return np.dot((embeddings),embeddings.transpose()), np.std(self.embeddings[:,selected_obs],0)
+
+
+class Document2vec():
+    def __init__(self, document, w2v, max_len=1000, random=1):
+        self.w2v = w2v
+        self.word2vec = w2v.word2vec
+        self.max_len = max_len
+        self.doc_embedding = self.build_doc_embedding(document)
+
+    def build_doc_embedding(self, doc):
+        return np.array([self.word2vec[w].ravel() for w in doc[:self.max_len] if w in self.word2vec])
+
+    def vocab_similarity(self, size=False):
+        if size:
+            selected_obs = np.random.choice(range(self.doc_embedding.shape[1]), size, replace=True)
+        else:
+            selected_obs = list(range(self.doc_embedding.shape[1]))
+        norm = np.sqrt(np.sum(self.doc_embedding[:, selected_obs] ** 2, 0))
+        return np.dot((self.doc_embedding[:, selected_obs] / norm).transpose(),
+                      self.doc_embedding[:, selected_obs] / norm)
+
+    def semantic_similarity(self, size=False):
+        if size:
+            selected_obs = np.random.choice(range(self.doc_embedding.shape[1]), size, replace=True)
+        else:
+            selected_obs = list(range(self.doc_embedding.shape[1]))
+        norm = np.sqrt(np.sum(self.doc_embedding[:, selected_obs] ** 2, 1)).reshape((-1, 1))
+        embeddings = self.doc_embedding[:, selected_obs] / norm
+        return np.dot((embeddings), embeddings.transpose())
+
+    def semantic_similarity_std(self, size=False):
+        if size:
+            selected_obs = np.random.choice(range(self.embeddings.shape[1]), size, replace=True)
+        else:
+            selected_obs = list(range(self.embeddings.shape[1]))
+        embeddings = (self.doc_embedding[:, selected_obs] - np.mean(self.doc_embedding[:, selected_obs], 0)) / np.std(
+            self.doc_embedding[:, selected_obs], 0)
+        return np.dot((embeddings), embeddings.transpose()), np.std(self.doc_embedding[:, selected_obs], 0)

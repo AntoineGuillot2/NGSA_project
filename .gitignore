@@ -13,6 +13,7 @@ build/
 develop-eggs/
 dist/
 downloads/
+data/
 eggs/
 .eggs/
 lib/
@@ -86,6 +87,10 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+
+# notebook
+*.ipynb
+.idea
 
 # Spyder project settings
 .spyderproject

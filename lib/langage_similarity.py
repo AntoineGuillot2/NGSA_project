@@ -7,9 +7,9 @@ Created on Mon Mar 12 20:51:25 2018
 """
 from .w2vec import Word2vec
 from .build_graph import build_graph
-from .mutivariate_u_test import U_test_gpu_large
+#from .mutivariate_u_test import U_test_gpu_large
 import numpy as np
-from .eigh_gpu import eigh_gpu
+#from .eigh_gpu import eigh_gpu
 from scipy.stats import mannwhitneyu
 
 
@@ -56,7 +56,8 @@ def matrix_spectrum(mat,center=True,standardize=True):
     if standardize:
         mat=mat/np.std(mat)
     mat*=1/np.sqrt(mat.shape[0])
-    return eigh_gpu(mat)
+    eigval, eigvec = np.linalg.eig(mat)
+    return eigvec, eigval
 
 
 def GraphSpikedTST_PC(lang_A,lang_B,dict_size=100000,random=1,n_graph=100,plot_spectrum=False):
