@@ -74,7 +74,7 @@ class Doc2vec():
         self.w2v = w2v
         self.word2vec = w2v.word2vec
         self.max_len = max_len
-        self.doc_embedding = self.build_doc_embedding(document)
+        self.doc_embedding = self.build_doc_embedding(document.lower().rstrip().split())
 
     def build_doc_embedding(self, doc):
         return np.array([self.word2vec[w].ravel() for w in doc[:self.max_len] if w in self.word2vec]).T

@@ -5,6 +5,9 @@ from .w2vec import Doc2vec
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+def get_spikes(eigvals):
+    spike = (eigvals > 2.05 + np.mean(eigvals)) + (eigvals < -2.05 + np.mean(eigvals))
+    return eigvals[spike]
 
 def build_doc_graph(doc, w2v, dict_size):
     d2v = Doc2vec(doc, w2v, dict_size)
@@ -127,3 +130,36 @@ def GraphSpikedTST_Cov(docA, docB, w2v, max_len=100000, random=1, n_graph=100, p
     U_test = mannwhitneyu(eigvals_A, eigvals_B, alternative='two-sided')[1]
 
     return U_test, U_test_spike, eigvals_A, eigvals_B
+
+def GraphSpiked_PC(doc, w2v, max_len=100000, n_graph=100):
+    sim_A = build_doc_semantic_sim(doc, w2v, max_len)
+    n_eigen_A = sim_A.shape[0]
+    eigvals_A = np.zeros(n_eigen_A * n_graph)
+
+    for i in tqdm(range(n_graph)):
+        graph_A = build_graph(sim_A)
+        eigvect_A, eigval_A = matrix_spectrum(graph_A)
+        eigvals_A[i * n_eigen_A:(i + 1) * n_eigen_A] = eigval_A
+
+    spike_A = (eigvals_A > 2.05 + np.mean(eigvals_A)) + (eigvals_A < -2.05 + np.mean(eigvals_A))
+    eig_spike_A = eigvals_A[spike_A]
+
+    return eigvals_A, eig_spike_A
+
+def GraphSpkied_Cov(doc, w2v, max_len=100000, random=1, n_graph=100, plot_spectrum=False):
+    n_words = 1024
+
+    eigvals_A = np.zeros(n_words * n_graph)
+    d2vA = Doc2vec(doc, w2v, max_len)
+
+    for i in tqdm(range(n_graph)):
+        sim_A = d2vA.vocab_similarity(size=n_words)
+
+        graph_A = build_graph(sim_A)
+        eigvect_A, eigval_A = matrix_spectrum(graph_A)
+        eigvals_A[i * n_words:(i + 1) * n_words] = eigval_A
+
+    spike_A = (eigvals_A > 2.05 + np.mean(eigvals_A)) + (eigvals_A < -2.05 + np.mean(eigvals_A))
+    eig_spike_A = eigvals_A[spike_A]
+
+    return eigvals_A, eig_spike_A

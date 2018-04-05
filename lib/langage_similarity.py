@@ -14,6 +14,9 @@ import numpy as np
 #from .eigh_gpu import eigh_gpu
 from scipy.stats import mannwhitneyu
 
+def get_spikes(eigvals):
+    spike = (eigvals > 2.05 + np.mean(eigvals)) + (eigvals < -2.05 + np.mean(eigvals))
+    return eigvals[spike]
 
 def U_test_langage_large(lang_A,lang_B,dict_size=4000,random=1):
     graph_A=build_langage_graph(lang_A,dict_size,random)
