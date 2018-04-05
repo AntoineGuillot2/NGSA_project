@@ -69,15 +69,15 @@ class Word2vec():
         return np.dot((embeddings),embeddings.transpose()), np.std(self.embeddings[:,selected_obs],0)
 
 
-class Document2vec():
-    def __init__(self, document, w2v, max_len=1000, random=1):
+class Doc2vec():
+    def __init__(self, document, w2v, max_len=100000, random=1):
         self.w2v = w2v
         self.word2vec = w2v.word2vec
         self.max_len = max_len
         self.doc_embedding = self.build_doc_embedding(document)
 
     def build_doc_embedding(self, doc):
-        return np.array([self.word2vec[w].ravel() for w in doc[:self.max_len] if w in self.word2vec])
+        return np.array([self.word2vec[w].ravel() for w in doc[:self.max_len] if w in self.word2vec]).T
 
     def vocab_similarity(self, size=False):
         if size:

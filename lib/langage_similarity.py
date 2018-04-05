@@ -7,6 +7,8 @@ Created on Mon Mar 12 20:51:25 2018
 """
 from .w2vec import Word2vec
 from .build_graph import build_graph
+import matplotlib.pyplot as plt
+from tqdm import tqdm
 #from .mutivariate_u_test import U_test_gpu_large
 import numpy as np
 #from .eigh_gpu import eigh_gpu
@@ -43,12 +45,6 @@ def build_langage_semantic_sim(file,dict_size,random=1):
     sim=w2vect.semantic_similarity()
     sim=(sim-np.min(sim)+10e-3)/(np.max(sim)-np.min(sim)+10e-3)
     return sim
-
-
-
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-
 
 def matrix_spectrum(mat,center=True,standardize=True):
     if center:
